@@ -27,6 +27,10 @@ This writes `output.png` (and `run.sh` also copies it to
 deterministic — no network, no clock, no randomness — so repeated
 runs produce byte-identical output.
 
+Pillow is the only dependency (see `requirements.txt`). The DejaVu
+fonts used for the text are bundled in `fonts/`, so the build works
+on any machine whether or not the system has those fonts installed.
+
 ## Layout
 
 - Dark navy background, white headlines, amber accents.

@@ -3,8 +3,13 @@
 
 Draws a 1024x1024 PNG news summary: one hero story across the top
 and four more stories in a 2x2 grid below. Fully deterministic:
-no network, no clock, no randomness. Output goes to output.png
-in the current directory.
+no network, no clock, no randomness.
+
+The DejaVu fonts are bundled in fonts/ next to this script, so the
+build works on any machine whether or not the system has them
+installed. Output goes to /output/entry.png when that directory is
+writable (the path the make.fun harness reads) and to output.png
+next to this script otherwise.
 """
 
 import os
@@ -23,9 +28,38 @@ MUTED = (168, 188, 208)
 AMBER = (255, 176, 32)
 RED = (226, 75, 66)
 
-FONT_DIR = "/usr/share/fonts/truetype/dejavu"
-FONT_REGULAR = os.path.join(FONT_DIR, "DejaVuSans.ttf")
-FONT_BOLD = os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+
+SYSTEM_FONT_DIRS = [
+    "/usr/share/fonts/truetype/dejavu",
+    "/usr/share/fonts/TTF",
+    "/usr/share/fonts/dejavu",
+]
+
+
+def _font_paths(bold):
+    """Candidate font files, best first: bundled, then system."""
+    name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
+    paths = [
+        os.path.join(_HERE, "fonts", name),
+        os.path.join(_HERE, name),
+    ]
+    paths.extend(os.path.join(d, name) for d in SYSTEM_FONT_DIRS)
+    return paths
+
+
+def load_font(bold, size):
+    for path in _font_paths(bold):
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            continue
+    # Last resort: Pillow's built-in default font. The layout still
+    # renders and the program still exits 0 on a bare machine.
+    try:
+        return ImageFont.load_default(size)
+    except TypeError:
+        return ImageFont.load_default()
 
 HERO = {
     "tag": "TOP STORY",
@@ -70,11 +104,6 @@ STORIES = [
         ),
     },
 ]
-
-
-def load_font(bold, size):
-    path = FONT_BOLD if bold else FONT_REGULAR
-    return ImageFont.truetype(path, size)
 
 
 def wrap(draw, text, font, max_width):
@@ -230,9 +259,26 @@ def build():
 
 def main():
     image = build()
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output.png")
-    image.save(out_path, format="PNG")
-    print("wrote", out_path, image.size)
+    # Try the harness path first, then next to this script. Either one
+    # succeeding is enough; a read-only checkout must not kill the run
+    # when /output is writable, and vice versa.
+    targets = [
+        "/output/entry.png",
+        os.path.join(_HERE, "output.png"),
+    ]
+    saved = []
+    for out_path in targets:
+        try:
+            parent = os.path.dirname(out_path)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+            image.save(out_path, format="PNG")
+            saved.append(out_path)
+        except OSError:
+            continue
+    if not saved:
+        raise SystemExit("could not write the output image anywhere")
+    print("wrote", ", ".join(saved), image.size)
 
 
 if __name__ == "__main__":

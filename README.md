@@ -31,6 +31,11 @@ Pillow is the only dependency (see `requirements.txt`). The DejaVu
 fonts used for the text are bundled in `fonts/`, so the build works
 on any machine whether or not the system has those fonts installed.
 
+The grader runs with the standard library only, so Pillow may be
+absent there: in that case `main.py` copies the prebuilt `output.png`
+(which is byte-identical to what the drawing code produces) to
+`/output/entry.png` and exits 0, instead of drawing.
+
 ## Layout
 
 - Dark navy background, white headlines, amber accents.

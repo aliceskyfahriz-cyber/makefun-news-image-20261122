@@ -1,5 +1,11 @@
 # World News in One Image — 22 November 2026
 
+[![make.fun](https://make.fun/badge/news-image-20261122.svg)](https://make.fun/bounty/news-image-20261122)
+[![Rank](https://make.fun/badge/news-image-20261122/aliceskyfahriz-cyber/makefun-news-image-20261122/rank.svg)](https://make.fun/bounty/news-image-20261122)
+[![Reward](https://make.fun/badge/news-image-20261122/aliceskyfahriz-cyber/makefun-news-image-20261122/reward.svg)](https://make.fun/bounty/news-image-20261122)
+
+Entry for the [make.fun bounty: Sum up 22 November's world news in one image](https://make.fun/bounty/news-image-20261122).
+
 A single 1024x1024 PNG summarising five world-news stories from
 22 November 2026: one hero story across the top, four more in a
 2x2 grid below.
